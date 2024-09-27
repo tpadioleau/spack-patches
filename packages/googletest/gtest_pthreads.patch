@@ -1,0 +1,12 @@
+diff --git a/googletest/cmake/internal_utils.cmake b/googletest/cmake/internal_utils.cmake
+index 41405587..e13a2fb4 100644
+--- a/googletest/cmake/internal_utils.cmake
++++ b/googletest/cmake/internal_utils.cmake
+@@ -195,6 +195,7 @@ function(cxx_library_with_type name type cxx_flags)
+     endif()
+     target_link_libraries(${name} PUBLIC ${threads_spec})
+   endif()
++  target_compile_definitions(${name} PUBLIC ${GTEST_HAS_PTHREAD_MACRO})
+ 
+   if (NOT "${CMAKE_VERSION}" VERSION_LESS "3.8")
+     target_compile_features(${name} PUBLIC cxx_std_14)
