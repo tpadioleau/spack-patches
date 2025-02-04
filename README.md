@@ -9,3 +9,4 @@ The repository contains patches necessary to compile the gyselalibxx dependencie
 - kokkos-kernels: add the version 4.5.1
 - kokkos-fft: new package
 - ddc: new package
+- kokkos-tools: ensure libraries are found in the view `LD_LIBRARY_PATH`
