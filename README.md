@@ -5,3 +5,4 @@ The repository contains patches necessary to compile the gyselalibxx dependencie
 ## List of patches
 
 - ginkgo: add the version 1.9.0
+- kokkos: add the version 4.5.1
