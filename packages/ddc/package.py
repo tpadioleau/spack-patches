@@ -32,6 +32,7 @@ class Ddc(CMakePackage):
     depends_on('kokkos +hip_relocatable_device_code', when='^kokkos +rocm')
     depends_on('kokkos-fft@0.2.1:0 +host', when='+fft')
     depends_on('kokkos-kernels@4.5.1:4', when='+splines')
+    depends_on('lapack', when='+splines')
     depends_on('pdi@1.6:1', when='+pdi')
 
     conflicts('kokkos@4.5.0')
