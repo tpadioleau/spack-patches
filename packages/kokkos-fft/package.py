@@ -50,11 +50,11 @@ class KokkosFft(CMakePackage):
         args = [
             self.define("KokkosFFT_ENABLE_INTERNAL_KOKKOS", False),
             self.define_from_variant("KokkosFFT_ENABLE_HOST_AND_DEVICE", "host"),
-            self.define("KokkosFFT_ENABLE_TESTS", "unit_test"),
+            self.define_from_variant("KokkosFFT_ENABLE_TESTS", "unit_test"),
             self.define("KokkosFFT_ENABLE_DOCS", False),
             self.define("KokkosFFT_ENABLE_BENCHMARK", False),
             self.define("KokkosFFT_ENABLE_EXAMPLES", False),
-            self.define("CMAKE_CXX_COMPILER", self["kokkos"].kokkos_cxx),
+            self.define("CMAKE_CXX_COMPILER", self.spec["kokkos"].kokkos_cxx),
         ]
 
         return args

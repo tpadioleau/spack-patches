@@ -28,7 +28,7 @@ class Ddc(CMakePackage):
     depends_on('cmake@3.22:3', type='build')
     depends_on('ginkgo@1.8:1', when='+splines')
     depends_on('kokkos@4.4.1:4')
-    depends_on('kokkos +cuda_constexpr +cuda_relocatable_device_code', when='^kokkos +cuda')
+    depends_on('kokkos +cuda_constexpr +cuda_lambda +cuda_relocatable_device_code', when='^kokkos +cuda')
     depends_on('kokkos +hip_relocatable_device_code', when='^kokkos +rocm')
     depends_on('kokkos-fft@0.2.1:0 +host', when='+fft')
     depends_on('kokkos-kernels@4.5.1:4', when='+splines')
@@ -48,7 +48,8 @@ class Ddc(CMakePackage):
             self.define('DDC_Kokkos_DEPENDENCY_POLICY', 'INSTALLED'),
             self.define_from_variant('DDC_BUILD_KERNELS_FFT', 'fft'),
             self.define_from_variant('DDC_BUILD_KERNELS_SPLINES', 'splines'),
-            self.define_from_variant('DDC_BUILD_PDI_WRAPPER', 'pdi')
+            self.define_from_variant('DDC_BUILD_PDI_WRAPPER', 'pdi'),
+            self.define("CMAKE_CXX_COMPILER", self.spec["kokkos"].kokkos_cxx)
         ]
         if '+fft' in self.spec:
             args.append(self.define('DDC_KokkosFFT_DEPENDENCY_POLICY', 'INSTALLED'))
