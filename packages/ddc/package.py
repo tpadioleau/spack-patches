@@ -50,18 +50,20 @@ class Ddc(CMakePackage):
     depends_on("cxx", type="build")
 
     depends_on("cmake@3.22:3", type="build")
-    depends_on("ginkgo@1.8:1", when="+splines")
     depends_on("kokkos@4.4.1:4")
-    depends_on(
-        "kokkos +cuda_constexpr +cuda_lambda +cuda_relocatable_device_code", when="^kokkos +cuda"
-    )
-    depends_on("kokkos +hip_relocatable_device_code", when="^kokkos +rocm")
+    # +fft
     depends_on("kokkos-fft@0.2.1 +host", when="+fft")
+    # +splines
+    depends_on("ginkgo@1.8:1", when="+splines")
     depends_on("kokkos-kernels@4.5.1:4", when="+splines")
     depends_on("lapack", when="+splines")
+    # +pdi
     depends_on("pdi@1.6:1", when="+pdi")
 
-    conflicts("kokkos@4.5.0", msg="The embedded mdspan in Kokkos is not compatible with DDC.")
+    conflicts("^kokkos@4.5.0", msg="DDC is not compatible with the embedded mdspan of Kokkos.")
+    conflicts("^kokkos ~cuda_constexpr", msg="DDC relies on the constexpr support of nvcc.")
+    conflicts("^kokkos ~cuda_relocatable_device_code", msg="DDC relies on relocatable device code.")
+    conflicts("^kokkos ~hip_relocatable_device_code", msg="DDC relies on relocatable device code.")
 
     def cmake_args(self):
         args = [
