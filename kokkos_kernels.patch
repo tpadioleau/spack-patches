@@ -1,0 +1,13 @@
+diff --git a/repos/spack_repo/builtin/packages/kokkos_kernels/package.py b/repos/spack_repo/builtin/packages/kokkos_kernels/package.py
+index 41e6ebf147..5b7d9a6a50 100644
+--- a/repos/spack_repo/builtin/packages/kokkos_kernels/package.py
++++ b/repos/spack_repo/builtin/packages/kokkos_kernels/package.py
+@@ -1,8 +1,6 @@
+ # Copyright Spack Project Developers. See COPYRIGHT file for details.
+ #
+ # SPDX-License-Identifier: (Apache-2.0 OR MIT)
+-from spack_repo.builtin.build_systems.cmake import CMakePackage
+-from spack_repo.builtin.build_systems.cuda import CudaPackage
+ 
+ from spack.package import *
+ 

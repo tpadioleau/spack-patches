@@ -1,0 +1,24 @@
+diff --git a/repos/spack_repo/builtin/packages/ginkgo/package.py b/repos/spack_repo/builtin/packages/ginkgo/package.py
+index a8a2222ab0..3092587558 100644
+--- a/repos/spack_repo/builtin/packages/ginkgo/package.py
++++ b/repos/spack_repo/builtin/packages/ginkgo/package.py
+@@ -5,10 +5,6 @@
+ import os
+ import sys
+ 
+-from spack_repo.builtin.build_systems.cmake import CMakePackage
+-from spack_repo.builtin.build_systems.cuda import CudaPackage
+-from spack_repo.builtin.build_systems.rocm import ROCmPackage
+-
+ from spack.package import *
+ 
+ 
+@@ -136,7 +132,7 @@ class Ginkgo(CMakePackage, CudaPackage, ROCmPackage):
+         when="+rocm @1.8.0",
+     )
+ 
+-    def setup_build_environment(self, env: EnvironmentModifications) -> None:
++    def setup_build_environment(self, env):
+         spec = self.spec
+         if spec.satisfies("+sycl"):
+             env.set("MKLROOT", join_path(spec["intel-oneapi-mkl"].prefix, "mkl", "latest"))

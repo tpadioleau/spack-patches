@@ -1,0 +1,33 @@
+diff --git a/repos/spack_repo/builtin/packages/kokkos/package.py b/repos/spack_repo/builtin/packages/kokkos/package.py
+index dd733c4d60..99020b0500 100644
+--- a/repos/spack_repo/builtin/packages/kokkos/package.py
++++ b/repos/spack_repo/builtin/packages/kokkos/package.py
+@@ -3,9 +3,7 @@
+ # SPDX-License-Identifier: (Apache-2.0 OR MIT)
+ import os
+ 
+-from spack_repo.builtin.build_systems.cmake import CMakePackage
+-from spack_repo.builtin.build_systems.cuda import CudaPackage
+-from spack_repo.builtin.build_systems.rocm import ROCmPackage
++import llnl.util.lang as lang
+ 
+ from spack.package import *
+ 
+@@ -441,7 +439,7 @@ class Kokkos(CMakePackage, CudaPackage, ROCmPackage):
+     @property
+     def kokkos_cxx(self) -> str:
+         if self.spec.satisfies("+wrapper"):
+-            return self["kokkos-nvcc-wrapper"].kokkos_cxx
++            return self.spec["kokkos-nvcc-wrapper"].kokkos_cxx
+         # Assumes build-time globals have been set already
+         return spack_cxx
+ 
+@@ -535,7 +533,7 @@ class Kokkos(CMakePackage, CudaPackage, ROCmPackage):
+         )
+ 
+         # Remove duplicate options
+-        return dedupe(options)
++        return lang.dedupe(options)
+ 
+     test_script_relative_path = join_path("scripts", "spack_test")
+ 
