@@ -1,0 +1,33 @@
+---
+name: Tests on Ubuntu
+
+# yamllint disable-line rule:truthy
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  check-diff:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+        with:
+          repository: spack/spack-packages
+          ref: v2025.07.0
+          path: spack-packages
+      - run: |
+          cp v2025.07_to_v0.23.1.patch spack-packages/
+          git -C spack-packages apply v2025.07_to_v0.23.1.patch
+          cp -r spack-packages/repos/spack_repo/builtin/packages/ginkgo/* packages/ginkgo
+          cp -r spack-packages/repos/spack_repo/builtin/packages/kokkos/* packages/kokkos
+          cp -r spack-packages/repos/spack_repo/builtin/packages/kokkos_fft/* packages/kokkos-fft
+          cp -r spack-packages/repos/spack_repo/builtin/packages/kokkos_kernels/* packages/kokkos-kernels
+          cp -r spack-packages/repos/spack_repo/builtin/packages/kokkos_nvcc_wrapper/* packages/kokkos-nvcc-wrapper
+          cp -r spack-packages/repos/spack_repo/builtin/packages/kokkos_tools/* packages/kokkos-tools
+          rm -rf spack-packages
+          git add . && git diff --staged --exit-code

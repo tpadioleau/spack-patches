@@ -1,0 +1,149 @@
+diff --git a/repos/spack_repo/builtin/packages/ginkgo/package.py b/repos/spack_repo/builtin/packages/ginkgo/package.py
+index a8a2222ab0..b6a3a216c0 100644
+--- a/repos/spack_repo/builtin/packages/ginkgo/package.py
++++ b/repos/spack_repo/builtin/packages/ginkgo/package.py
+@@ -5,10 +5,6 @@
+ import os
+ import sys
+ 
+-from spack_repo.builtin.build_systems.cmake import CMakePackage
+-from spack_repo.builtin.build_systems.cuda import CudaPackage
+-from spack_repo.builtin.build_systems.rocm import ROCmPackage
+-
+ from spack.package import *
+ 
+ 
+@@ -136,7 +132,7 @@ class Ginkgo(CMakePackage, CudaPackage, ROCmPackage):
+         when="+rocm @1.8.0",
+     )
+ 
+-    def setup_build_environment(self, env: EnvironmentModifications) -> None:
++    def setup_build_environment(self, env):
+         spec = self.spec
+         if spec.satisfies("+sycl"):
+             env.set("MKLROOT", join_path(spec["intel-oneapi-mkl"].prefix, "mkl", "latest"))
+@@ -206,6 +202,7 @@ class Ginkgo(CMakePackage, CudaPackage, ROCmPackage):
+             if archs != "none":
+                 arch_str = ";".join(archs)
+                 args.append("-DGINKGO_HIP_AMDGPU={0}".format(arch_str))
++                args.append(self.define("CMAKE_HIP_ARCHITECTURES", arch_str))
+             if spec.satisfies("^hip@5.2.0:"):
+                 args.append(
+                     self.define("CMAKE_MODULE_PATH", self.spec["hip"].prefix.lib.cmake.hip)
+diff --git a/repos/spack_repo/builtin/packages/kokkos/package.py b/repos/spack_repo/builtin/packages/kokkos/package.py
+index dd733c4d60..1cb90c86ba 100644
+--- a/repos/spack_repo/builtin/packages/kokkos/package.py
++++ b/repos/spack_repo/builtin/packages/kokkos/package.py
+@@ -3,9 +3,7 @@
+ # SPDX-License-Identifier: (Apache-2.0 OR MIT)
+ import os
+ 
+-from spack_repo.builtin.build_systems.cmake import CMakePackage
+-from spack_repo.builtin.build_systems.cuda import CudaPackage
+-from spack_repo.builtin.build_systems.rocm import ROCmPackage
++import llnl.util.lang as lang
+ 
+ from spack.package import *
+ 
+@@ -441,7 +439,7 @@ class Kokkos(CMakePackage, CudaPackage, ROCmPackage):
+     @property
+     def kokkos_cxx(self) -> str:
+         if self.spec.satisfies("+wrapper"):
+-            return self["kokkos-nvcc-wrapper"].kokkos_cxx
++            return self.spec["kokkos-nvcc-wrapper"].kokkos_cxx
+         # Assumes build-time globals have been set already
+         return spack_cxx
+ 
+@@ -535,7 +533,7 @@ class Kokkos(CMakePackage, CudaPackage, ROCmPackage):
+         )
+ 
+         # Remove duplicate options
+-        return dedupe(options)
++        return lang.dedupe(options)
+ 
+     test_script_relative_path = join_path("scripts", "spack_test")
+ 
+@@ -570,7 +568,7 @@ class Kokkos(CMakePackage, CudaPackage, ROCmPackage):
+         cmake = self.spec["cmake"].command
+         cmake_args = ["-DEXECUTABLE_OUTPUT_PATH=" + cmake_path]
+         if self.spec.satisfies("+rocm"):
+-            prefix_paths = ";".join(get_cmake_prefix_path(self))
++            prefix_paths = ";".join(spack.build_systems.cmake.get_cmake_prefix_path(self))
+             cmake_args.append("-DCMAKE_PREFIX_PATH={0}".format(prefix_paths))
+ 
+         cmake(cmake_path, *cmake_args)
+diff --git a/repos/spack_repo/builtin/packages/kokkos_fft/package.py b/repos/spack_repo/builtin/packages/kokkos_fft/package.py
+index 5bfbd2c61a..8aad28c8bc 100644
+--- a/repos/spack_repo/builtin/packages/kokkos_fft/package.py
++++ b/repos/spack_repo/builtin/packages/kokkos_fft/package.py
+@@ -70,8 +70,8 @@ class KokkosFft(CMakePackage):
+         ]
+ 
+         if self.spec.satisfies("^kokkos+rocm"):
+-            args.append(self.define("CMAKE_CXX_COMPILER", self["hip"].hipcc))
++            args.append(self.define("CMAKE_CXX_COMPILER", self.spec["hip"].hipcc))
+         else:
+-            args.append(self.define("CMAKE_CXX_COMPILER", self["kokkos"].kokkos_cxx))
++            args.append(self.define("CMAKE_CXX_COMPILER", self.spec["kokkos"].kokkos_cxx))
+ 
+         return args
+diff --git a/repos/spack_repo/builtin/packages/kokkos_kernels/package.py b/repos/spack_repo/builtin/packages/kokkos_kernels/package.py
+index 41e6ebf147..a84c2fc0eb 100644
+--- a/repos/spack_repo/builtin/packages/kokkos_kernels/package.py
++++ b/repos/spack_repo/builtin/packages/kokkos_kernels/package.py
+@@ -1,9 +1,6 @@
+ # Copyright Spack Project Developers. See COPYRIGHT file for details.
+ #
+ # SPDX-License-Identifier: (Apache-2.0 OR MIT)
+-from spack_repo.builtin.build_systems.cmake import CMakePackage
+-from spack_repo.builtin.build_systems.cuda import CudaPackage
+-
+ from spack.package import *
+ 
+ 
+@@ -303,7 +300,7 @@ class KokkosKernels(CMakePackage, CudaPackage):
+         if spec.satisfies("^kokkos+rocm"):
+             options.append(self.define("CMAKE_CXX_COMPILER", spec["hip"].hipcc))
+         else:
+-            options.append(self.define("CMAKE_CXX_COMPILER", self["kokkos"].kokkos_cxx))
++            options.append(self.define("CMAKE_CXX_COMPILER", spec["kokkos"].kokkos_cxx))
+ 
+         if self.run_tests:
+             options.append(self.define("KokkosKernels_ENABLE_TESTS", True))
+diff --git a/repos/spack_repo/builtin/packages/kokkos_nvcc_wrapper/package.py b/repos/spack_repo/builtin/packages/kokkos_nvcc_wrapper/package.py
+index ba820d059b..7d7a6b3db1 100644
+--- a/repos/spack_repo/builtin/packages/kokkos_nvcc_wrapper/package.py
++++ b/repos/spack_repo/builtin/packages/kokkos_nvcc_wrapper/package.py
+@@ -3,8 +3,6 @@
+ # SPDX-License-Identifier: (Apache-2.0 OR MIT)
+ import os
+ 
+-from spack_repo.builtin.build_systems.generic import Package
+-
+ from spack.package import *
+ 
+ 
+@@ -168,9 +166,7 @@ class KokkosNvccWrapper(Package):
+         mkdir(prefix.bin)
+         install(src, prefix.bin)
+ 
+-    def setup_dependent_build_environment(
+-        self, env: EnvironmentModifications, dependent_spec: Spec
+-    ) -> None:
++    def setup_dependent_build_environment(self, env, dependent_spec):
+         wrapper = join_path(self.prefix.bin, "nvcc_wrapper")
+         env.set("CUDA_ROOT", dependent_spec["cuda"].prefix)
+         env.set("NVCC_WRAPPER_DEFAULT_COMPILER", self.compiler.cxx)
+diff --git a/repos/spack_repo/builtin/packages/kokkos_tools/package.py b/repos/spack_repo/builtin/packages/kokkos_tools/package.py
+index 88ae81f8a9..c27751b3df 100644
+--- a/repos/spack_repo/builtin/packages/kokkos_tools/package.py
++++ b/repos/spack_repo/builtin/packages/kokkos_tools/package.py
+@@ -2,8 +2,6 @@
+ #
+ # SPDX-License-Identifier: (Apache-2.0 OR MIT)
+ 
+-from spack_repo.builtin.build_systems.cmake import CMakePackage
+-
+ from spack.package import *
+ 
+ 
