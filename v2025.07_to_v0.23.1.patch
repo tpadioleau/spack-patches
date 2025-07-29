@@ -73,10 +73,19 @@ index dd733c4d60..1cb90c86ba 100644
  
          cmake(cmake_path, *cmake_args)
 diff --git a/repos/spack_repo/builtin/packages/kokkos_fft/package.py b/repos/spack_repo/builtin/packages/kokkos_fft/package.py
-index 5bfbd2c61a..8aad28c8bc 100644
+index 5bfbd2c61a..85369df9f6 100644
 --- a/repos/spack_repo/builtin/packages/kokkos_fft/package.py
 +++ b/repos/spack_repo/builtin/packages/kokkos_fft/package.py
-@@ -70,8 +70,8 @@ class KokkosFft(CMakePackage):
+@@ -2,8 +2,6 @@
+ #
+ # SPDX-License-Identifier: (Apache-2.0 OR MIT)
+ 
+-from spack_repo.builtin.build_systems.cmake import CMakePackage
+-
+ from spack.package import *
+ 
+ 
+@@ -70,8 +68,8 @@ class KokkosFft(CMakePackage):
          ]
  
          if self.spec.satisfies("^kokkos+rocm"):
