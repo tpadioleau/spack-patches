@@ -30,4 +30,5 @@ jobs:
           cp -r spack-packages/repos/spack_repo/builtin/packages/kokkos_nvcc_wrapper/* packages/kokkos-nvcc-wrapper
           cp -r spack-packages/repos/spack_repo/builtin/packages/kokkos_tools/* packages/kokkos-tools
           rm -rf spack-packages
-          git add . && git diff --staged --exit-code
+          git add .
+          git diff --staged --exit-code
